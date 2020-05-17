@@ -45,6 +45,17 @@ Then run the framework with:
 python -m flask run
 ```    
 
+## Adding new data
+To add new data: 
+
+1. Delete the data.db file
+2. Put the new data in the data_csv directory, making sure the naming of the csv files is consistent with the sample data
+3. Start the application with:
+
+```    
+python -m flask run
+```    
+
 ## Accessing the report 
 Go to 'http://127.0.0.1:5000/' or 'http://localhost:5000/'. Provide an iso-string as a date parameter e.g.
 

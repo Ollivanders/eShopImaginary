@@ -1,11 +1,20 @@
 import csv
 import os
 import datetime
+import pathlib
 
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+# import models
+basedir = os.path.dirname(os.path.abspath(__file__))
+
+# Create new database file if one does not exist and wipe if it already exists
+try:
+    os.remove("data.db")
+except OSError:
+    pass
+database_file = open("data.db", "w+")
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////' + os.path.join(basedir, 'data.db')
@@ -28,15 +37,16 @@ def get_report():
     """
     search_date = request.args.get('date')
 
-    # check date is in correct format
     if search_date == "" or search_date == None:
         return "You didn't provide a date. Use valid ISO-date string with the format \'YYYY-MM-DD\'"
 
+    # check date is in correct format
     if not date_format_checker(search_date):
         return "Please request using a valid ISO-date string with the format \'YYYY-MM-DD\'"
 
     earliest_record, latest_record = get_earliest_latest_dates()
     iso_date = datetime.datetime.strptime(search_date, '%Y-%m-%d')
+
     if earliest_record > iso_date or latest_record < iso_date:
         return "Sorry the date is out of range, try a date between: " + earliest_record.strftime(
             '%Y-%m-%d') + " and " + latest_record.strftime('%Y-%m-%d')
@@ -213,10 +223,12 @@ def initialise_db():
     Initialise the database, must have a data.db file present
     :return:
     """
+    print("Initialising Database")
     db.create_all()
     csv_file_to_db("orders")
     csv_file_to_db("order_lines")
     csv_file_to_db("product_promotions")
     csv_file_to_db("commissions")
 
-# initialise_db()
+
+initialise_db()
